@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Command Item</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Visionary-Crofting</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="appelOffre">AppelOfre</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="product">Product</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="commandItem">CommandItem</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Command">Command</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="m-4 container row" id="item-data" >
+    <div class="items col-9"  id="item-container">
+        <h1 class="text-center">Command Item</h1>
+    </div>
+    <div class = "total-command col-3"></div>
+</div>
+<script>
+    let itemData = getBasket();
+    console.log(itemData)
+    var container = document.getElementById('item-container');
+    var container2 = document.querySelector('.total-command');
+    let totalPrice = getTotalPrice();
+    for(let item of itemData){
+        console.log(item)
+        container.innerHTML += `
+        <div class="row m-4 border border-dark border-1 w-75">
+            <div class="col-sm-4">
+                <p ><strong>Name</strong> ${item.product.nom}</p>
+                <p><strong>Description</strong> ${item.product.descreption}</p>
+                                <p><strong>Category</strong> ${item.product.category}</p>
+                                 <p><strong>Quantity</strong> ${item.quantity}</p>
+
+                                    <p><strong>price</strong> ${item.product.price}</p>
+
+            </div>
+
+
+           <div class="col-sm-8">
+
+                <img src="https://via.placeholder.com/150" class="m-2" alt="Placeholder image">
+                <div class="m-2">
+                            <button onclick="changeQuantity(${item.product.id},1)" id="button" class="btn btn-info">+</button>
+                            <button onclick="changeQuantity(${item.product.id},-1)" class="btn btn-danger">-</button>
+            </div>
+            </div>
+
+        </div>`
+
+
+
+    }
+    container2.innerHTML=`
+<div class="card" style="height: 150px;">
+        <div class="card-body ">
+            <h5 class="card-title"><strong>Total price </strong></h5>
+            <p class="card-text">${totalPrice}</p>
+            <a href="Command" class="btn btn-primary">Commander</a>
+        </div>
+            </div>
+
+    `
+    function removeFromBasket(product){
+        let basket = getBasket();
+        let foundProduct = basket.filter(p=>p.id != product.id);
+        setBasket(basket);
+    }
+    function setBasket(basket){
+        localStorage.setItem("basket",JSON.stringify(basket));
+    }
+    function getBasket(){
+        let basket = localStorage.getItem("basket");
+        if(basket == null){
+            return [];
+        }else{
+            return JSON.parse(basket);
+        }
+    }
+
+
+    function changeQuantity(productId,quantity) {
+        let basket = getBasket();
+        console.log(productId,quantity)
+        let foundProduct = basket.find(p => p.product.id == productId);
+        if (foundProduct != undefined){
+            foundProduct.quantity += quantity;
+            if (foundProduct.quantity <= 0) {
+                removeFromBasket(foundProduct)
+            }else {
+                setBasket(basket)
+            }
+        }
+        window.location.reload()
+    }
+    function getTotalPrice(){
+        let basket = getBasket();
+        let total = 0;
+        for(let product of basket){
+            total += product.quantity * product.product.price;
+        }
+        return total;
+    }
+</script>
+</body>
+
+</html>
